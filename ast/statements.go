@@ -2,7 +2,7 @@ package ast
 
 import (
 	"bytes"
-	"writeingo/src/monkey/token"
+	"monkey/token"
 )
 
 // Statement doesn’t produce a value:

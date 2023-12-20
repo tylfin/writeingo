@@ -6,8 +6,8 @@ import (
 	"io"
 	"log"
 
-	"writeingo/src/monkey/lexer"
-	"writeingo/src/monkey/parser"
+	"monkey/lexer"
+	"monkey/parser"
 
 	"net/http"
 	_ "net/http/pprof"

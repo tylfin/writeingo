@@ -1,7 +1,7 @@
 package lexer
 
 import (
-	"writeingo/src/monkey/token"
+	"monkey/token"
 )
 
 // Lexer is a struct that contains the input string and the current position in the input

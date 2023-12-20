@@ -1,8 +1,8 @@
 package ast
 
 import (
+	"monkey/token"
 	"testing"
-	"writeingo/src/monkey/token"
 )
 
 func TestString(t *testing.T) {

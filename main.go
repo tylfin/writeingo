@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
+	"monkey/repl"
 	"os"
 	"os/user"
-	"writeingo/src/monkey/repl"
 )
 
 func main() {

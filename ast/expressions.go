@@ -2,8 +2,8 @@ package ast
 
 import (
 	"bytes"
+	"monkey/token"
 	"strings"
-	"writeingo/src/monkey/token"
 )
 
 // Expressions produce values:

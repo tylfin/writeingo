@@ -2,10 +2,10 @@ package parser
 
 import (
 	"fmt"
+	"monkey/ast"
+	"monkey/lexer"
+	"monkey/token"
 	"strconv"
-	"writeingo/src/monkey/ast"
-	"writeingo/src/monkey/lexer"
-	"writeingo/src/monkey/token"
 )
 
 const (
