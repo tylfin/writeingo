@@ -1,18 +1,13 @@
 package ast
 
-import "writeingo/src/monkey/token"
+import (
+	"bytes"
+	"writeingo/src/monkey/token"
+)
 
 type Node interface {
 	TokenLiteral() string
-}
-
-// Statement doesn’t produce a value:
-//
-//	return 5;
-//	let x = 5;
-type Statement interface {
-	Node
-	statementNode()
+	String() string
 }
 
 // Expressions produce values:
@@ -22,6 +17,17 @@ type Statement interface {
 type Expression interface {
 	Node
 	expressionNode()
+}
+
+type Identifier struct {
+	Token token.Token
+	Value string
+}
+
+func (i *Identifier) expressionNode()      {}
+func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
+func (i *Identifier) String() string {
+	return i.Value
 }
 
 // Program will serve as the root node of every AST our parser produces.
@@ -38,26 +44,11 @@ func (p *Program) TokenLiteral() string {
 	}
 }
 
-type LetStatement struct {
-	Token token.Token // the token.LET token
-	Name  *Identifier
+func (p *Program) String() string {
+	var out bytes.Buffer
+	for _, s := range p.Statements {
+		out.WriteString((s.String()))
+	}
+
+	return out.String()
 }
-
-func (ls *LetStatement) statementNode()       {}
-func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal }
-
-type Identifier struct {
-	Token token.Token
-	Value string
-}
-
-func (i *Identifier) expressionNode()      {}
-func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
-
-type ReturnStatement struct {
-	Token       token.Token // the token.RETURN token
-	ReturnValue Expression
-}
-
-func (rs *ReturnStatement) statementNode()       {}
-func (rs *ReturnStatement) TokenLiteral() string { return rs.Token.Literal }
