@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"log"
-	"monkey/repl"
 	"os"
 	"os/user"
+
+	"monkey/repl"
 )
 
+// main is the entry point of the program
 func main() {
 	user, err := user.Current()
 	if err != nil {

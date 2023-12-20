@@ -2,8 +2,9 @@ package ast
 
 import (
 	"bytes"
-	"monkey/token"
 	"strings"
+
+	"monkey/token"
 )
 
 // Expressions produce values:
@@ -15,7 +16,13 @@ type Expression interface {
 	expressionNode()
 }
 
-// Identifier represents an identifier expression (e.g. foobar).
+// Identifier represents an identifier expression
+// (e.g. x, foobar, add, result, etc.).
+//
+//	foobar
+//	add
+//	result
+//	x
 type Identifier struct {
 	Token token.Token
 	Value string
@@ -26,6 +33,10 @@ func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 func (i *Identifier) String() string       { return i.Value }
 
 // IntegerLiteral represents an integer literal expression (e.g. 5) using int64.
+//
+//	5
+//	10
+//	1234567890
 type IntegerLiteral struct {
 	Token token.Token
 	Value int64
@@ -55,6 +66,15 @@ func (p *PrefixExpression) String() string {
 	return out.String()
 }
 
+// InfixExpression represents an infix expression (e.g. 5 + 5).
+//
+//	5 + 5
+//	5 - 5
+//	5 * 5
+//	5 / 5
+//	5 > 5
+//	5 < 5
+//	5 == 5
 type InfixExpression struct {
 	Token    token.Token
 	Left     Expression
@@ -76,6 +96,11 @@ func (ie *InfixExpression) String() string {
 	return out.String()
 }
 
+// Boolean represents a boolean expression (e.g. true or false).
+//
+//	true
+//	false
+//	3 < 5 == true
 type Boolean struct {
 	Token token.Token
 	Value bool
@@ -85,6 +110,10 @@ func (b *Boolean) expressionNode()      {}
 func (b *Boolean) TokenLiteral() string { return b.Token.Literal }
 func (b *Boolean) String() string       { return b.Token.Literal }
 
+// IfExpression represents an if expression (e.g. if (x < y) { x } else { y }).
+//
+//	if (x < y) { x } else { y }
+//	if (x < y) { x }
 type IfExpression struct {
 	Token       token.Token
 	Condition   Expression
@@ -107,6 +136,11 @@ func (ie *IfExpression) String() string {
 	return out.String()
 }
 
+// FunctionLiteral represents a function literal expression (e.g. fn(x, y) { x + y }).
+//
+//	fn(x, y) { x + y }
+//	fn() { x + y }
+//	fn(x, y, z) { x + y + z }
 type FunctionLiteral struct {
 	Token      token.Token // The 'fn' token
 	Parameters []*Identifier
@@ -130,6 +164,12 @@ func (fl *FunctionLiteral) String() string {
 	return out.String()
 }
 
+// CallExpression represents a function call expression (e.g. add(1, 2)).
+//
+//	add(1, 2)
+//	fn()
+//	fn(x, y, z)
+//	fn(x + y)
 type CallExpression struct {
 	Token     token.Token // The '(' token
 	Function  Expression  // Identifier or FunctionLiteral

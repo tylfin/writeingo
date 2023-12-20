@@ -2,6 +2,7 @@ package ast
 
 import (
 	"bytes"
+
 	"monkey/token"
 )
 
@@ -14,6 +15,11 @@ type Statement interface {
 	statementNode()
 }
 
+// LetStatement represents a let statement
+//
+//	let x = 5;
+//	let y = 10;
+//	let foobar = 838383;
 type LetStatement struct {
 	Token token.Token // the token.LET token
 	Name  *Identifier
@@ -35,6 +41,11 @@ func (ls *LetStatement) String() string {
 	return out.String()
 }
 
+// ReturnStatement represents a return statement
+//
+//	return 5;
+//	return 10;
+//	return 993322;
 type ReturnStatement struct {
 	Token       token.Token // the token.RETURN token
 	ReturnValue Expression
@@ -52,6 +63,11 @@ func (rs *ReturnStatement) String() string {
 	return out.String()
 }
 
+// ExpressionStatement represents an expression statement
+//
+//	foobar;
+//	add(2, 3);
+//	foobar + barfoo;
 type ExpressionStatement struct {
 	Token      token.Token
 	Expression Expression
@@ -66,6 +82,12 @@ func (es *ExpressionStatement) String() string {
 	return ""
 }
 
+// BlockStatement represents a block statement
+//
+//	{
+//		foobar;
+//		barfoo;
+//	}
 type BlockStatement struct {
 	Token      token.Token // the { token
 	Statements []Statement
