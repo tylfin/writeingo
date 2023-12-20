@@ -68,7 +68,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.IF, p.parseIfExpression)
 	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
 
-	// Inflix functions
+	// Infix functions
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
 	p.registerInfix(token.MINUS, p.parseInfixExpression)
@@ -117,13 +117,13 @@ func (p *Parser) parsePrefixExpression() ast.Expression {
 }
 
 func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
-	inflix := &ast.InfixExpression{Token: p.curToken, Left: left, Operator: p.curToken.Literal}
+	infix := &ast.InfixExpression{Token: p.curToken, Left: left, Operator: p.curToken.Literal}
 
 	precendence := p.curPrecedence()
 	p.nextToken()
-	inflix.Right = p.parseExpression(precendence)
+	infix.Right = p.parseExpression(precendence)
 
-	return inflix
+	return infix
 }
 
 func (p *Parser) parseBoolean() ast.Expression {
@@ -378,13 +378,13 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 
 	leftExp := prefix()
 	for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() {
-		inflix := p.infixParseFns[p.peekToken.Type]
-		if inflix == nil {
+		infix := p.infixParseFns[p.peekToken.Type]
+		if infix == nil {
 			return leftExp
 		}
 
 		p.nextToken()
-		leftExp = inflix(leftExp)
+		leftExp = infix(leftExp)
 	}
 
 	return leftExp

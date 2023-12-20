@@ -25,6 +25,7 @@ func (i *Identifier) expressionNode()      {}
 func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 func (i *Identifier) String() string       { return i.Value }
 
+// IntegerLiteral represents an integer literal expression (e.g. 5) using int64.
 type IntegerLiteral struct {
 	Token token.Token
 	Value int64
@@ -34,6 +35,7 @@ func (il *IntegerLiteral) expressionNode()      {}
 func (il *IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
 func (il *IntegerLiteral) String() string       { return il.Token.Literal }
 
+// PrefixExpression represents a prefix expression (e.g. !5).
 type PrefixExpression struct {
 	Token    token.Token
 	Operator string
