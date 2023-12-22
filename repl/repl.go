@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 
+	"monkey/evaluator"
 	"monkey/lexer"
 	"monkey/parser"
 
@@ -38,7 +39,8 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		_, _ = io.WriteString(out, program.String())
+		evaluated := evaluator.Eval(program)
+		_, _ = io.WriteString(out, evaluated.Inspect())
 		_, _ = io.WriteString(out, "\n")
 	}
 }
