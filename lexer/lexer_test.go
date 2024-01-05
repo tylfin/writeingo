@@ -58,6 +58,7 @@ func TestNextTokenMonkeySample(t *testing.T) {
 	"foobar"
 	"foo bar"
 	""
+	[1, 2];
    `
 	tests := []struct {
 		expectedType    token.TokenType
@@ -142,6 +143,13 @@ func TestNextTokenMonkeySample(t *testing.T) {
 		{token.STRING, "foobar"},
 		{token.STRING, "foo bar"},
 		{token.STRING, ""},
+
+		{token.LBRACKET, "["},
+		{token.INT, "1"},
+		{token.COMMA, ","},
+		{token.INT, "2"},
+		{token.RBRACKET, "]"},
+		{token.SEMICOLON, ";"},
 
 		{token.EOF, ""},
 	}
