@@ -9,13 +9,17 @@ import (
 
 type ObjectType string
 
+type BuiltinFunction func(args ...Object) Object
+
 const (
 	NULL_OBJ         ObjectType = "NULL"
 	INTEGER_OBJ      ObjectType = "INTEGER"
+	STRING_OBJ       ObjectType = "STRING"
 	BOOLEAN_OBJ      ObjectType = "BOOLEAN"
 	RETURN_VALUE_OBJ ObjectType = "RETURN_VALUE"
 	ERROR_OBJ        ObjectType = "ERROR"
 	FUNCTION_OBJ     ObjectType = "FUNCTION"
+	BUILTIN_OBJ      ObjectType = "BUILTIN"
 )
 
 type Object interface {
@@ -34,6 +38,13 @@ type Integer struct {
 
 func (i *Integer) Type() ObjectType { return INTEGER_OBJ }
 func (i *Integer) Inspect() string  { return fmt.Sprintf("%d", i.Value) }
+
+type String struct {
+	Value string
+}
+
+func (s *String) Type() ObjectType { return STRING_OBJ }
+func (s *String) Inspect() string  { return s.Value }
 
 type Boolean struct {
 	Value bool
@@ -77,3 +88,10 @@ func (f *Function) Inspect() string {
 	out.WriteString("\n}")
 	return out.String()
 }
+
+type Builtin struct {
+	Fn BuiltinFunction
+}
+
+func (b *Builtin) Type() ObjectType { return BUILTIN_OBJ }
+func (b *Builtin) Inspect() string  { return "builtin function" }
