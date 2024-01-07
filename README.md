@@ -50,7 +50,7 @@ Where:
 
 Here is how we bind values to names in Monkey:
 
-```monkey
+```bash
 let age = 1;
 let name = "Monkey";
 let result = 10 * (20 / 2);
@@ -59,7 +59,7 @@ let result = 10 * (20 / 2);
 Besides integers, booleans and strings, the Monkey interpreter supports arrays and hashes.
 Here’s what binding an array of integers to a name looks like:
 
-```monkey
+```bash
 let myArray = [1, 2, 3, 4, 5];
 And here is a hash, where values are associated with keys:
 let thorsten = {"name": "Thorsten", "age": 28};
@@ -69,26 +69,26 @@ myArray[0] // => 1 thorsten["name"] // => "Thorsten"
 
 The let statements can also be used to bind functions to names. Here’s a small function that adds two numbers:
 
-```monkey
+```bash
 let add = fn(a, b) { return a + b; };
 ```
 
 Implicit return values are also possible,
 
-```monkey
+```bash
 let add = fn(a, b) { a + b; };
 ```
 
 And calling a function is as easy as you’d expect:
 
-```monkey
+```bash
 add(1, 2);
 ```
 
 A more complex function, such as a fibonacci function that returns the Nth Fibonacci number,
 might look like this:
 
-```monkey
+```bash
 let fibonacci = fn(x) {
     if (x == 0) {
         0
@@ -107,15 +107,13 @@ Note the recursive calls to fibonacci itself!
 Monkey also supports a special type of functions, called higher order functions. These are functions that take other
 functions as arguments. Here is an example:
 
-```monkey
-let twice = fn(f, x) { return f(f(x));
-};
-let addTwo = fn(x) { return x + 2;
-};
+```bash
+let twice = fn(f, x) { return f(f(x)); };
+let addTwo = fn(x) { return x + 2; };
 twice(addTwo, 2); // => 6
 ```
 
 ## PDF References
 
 - [Writing An Interpreter in Go](./docs/pdfs/writing_an_interpreter_in_go.pdf)
-- Writing a Compiler in Go
+- [Writing a Compiler in Go](./docs/pdfs/writing_a_compiler_in_go.pdf)
