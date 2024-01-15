@@ -6,10 +6,10 @@ import (
 	"io"
 	"log"
 
-	"monkey/evaluator"
+	"monkey/compiler"
 	"monkey/lexer"
-	"monkey/object"
 	"monkey/parser"
+	"monkey/vm"
 
 	"net/http"
 	_ "net/http/pprof"
@@ -23,7 +23,7 @@ func Start(in io.Reader, out io.Writer) {
 	}()
 
 	scanner := bufio.NewScanner(in)
-	env := object.NewEnvironment()
+	// env := object.NewEnvironment()
 
 	for {
 		fmt.Printf(PROMPT)
@@ -42,11 +42,30 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		evaluated := evaluator.Eval(program, env)
-		if evaluated != nil {
-			_, _ = io.WriteString(out, evaluated.Inspect())
-			_, _ = io.WriteString(out, "\n")
+		comp := compiler.New()
+		err := comp.Compile(program)
+		if err != nil {
+			fmt.Fprintf(out, "Woops! Compilation failed:\n %s\n", err)
+			continue
 		}
+
+		machine := vm.New(comp.Bytecode())
+		err = machine.Run()
+		if err != nil {
+			fmt.Fprintf(out, "Woops! Executing bytecode failed:\n %s\n", err)
+			continue
+		}
+
+		stackTop := machine.StackTop()
+		_, _ = io.WriteString(out, stackTop.Inspect())
+		_, _ = io.WriteString(out, "\n")
+
+		// Eval is the interper-based solution from book 1.
+		// evaluated := evaluator.Eval(program, env)
+		// if evaluated != nil {
+		// 	_, _ = io.WriteString(out, evaluated.Inspect())
+		// 	_, _ = io.WriteString(out, "\n")
+		// }
 	}
 }
 
