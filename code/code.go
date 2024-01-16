@@ -48,6 +48,7 @@ const (
 	// OpConstant retrieves the constant using the operand as an index and pushes it on to the stack
 	OpConstant Opcode = iota
 	OpAdd
+	OpPop
 )
 
 type Definition struct {
@@ -60,6 +61,7 @@ var definitions = map[Opcode]*Definition{
 	// 65536 total representable constants (including zero).
 	OpConstant: {"OpConstant", []int{2}},
 	OpAdd:      {"OpAdd", []int{}},
+	OpPop:      {"OpPop", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {

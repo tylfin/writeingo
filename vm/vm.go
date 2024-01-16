@@ -47,11 +47,18 @@ func (vm *VM) Run() error {
 			result := leftValue + rightValue
 			if err := vm.push(&object.Integer{Value: result}); err != nil {
 				return err
+
 			}
+		case code.OpPop:
+			vm.pop()
 		}
 	}
 
 	return nil
+}
+
+func (vm *VM) LastPoppedStackElem() object.Object {
+	return vm.stack[vm.sp]
 }
 
 func (vm *VM) push(o object.Object) error {
