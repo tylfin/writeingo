@@ -12,6 +12,7 @@ const StackSize = 2048
 var (
 	True  = &object.Boolean{Value: true}
 	False = &object.Boolean{Value: false}
+	Null  = &object.Null{}
 )
 
 type VM struct {
@@ -67,12 +68,40 @@ func (vm *VM) Run() error {
 			if err := vm.push(False); err != nil {
 				return err
 			}
+		case code.OpNull:
+			if err := vm.push(Null); err != nil {
+				return err
+			}
 		case code.OpPop:
 			vm.pop()
+		case code.OpJump:
+			// If we reach a jump, just perform it nothing to think about
+			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip = pos - 1
+		case code.OpJumpNotTruthy:
+			// If we reach a OpJumpNotTruthy we need to check if the condition is true, otherwise we skip
+			// to the alternative statement
+			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+			condition := vm.pop()
+			if !isTruthy(condition) {
+				ip = pos - 1
+			}
 		}
 	}
 
 	return nil
+}
+
+func isTruthy(obj object.Object) bool {
+	switch obj := obj.(type) {
+	case *object.Boolean:
+		return obj.Value
+	case *object.Null:
+		return false
+	default:
+		return true
+	}
 }
 
 func (vm *VM) executeBangOperator() error {
@@ -81,6 +110,8 @@ func (vm *VM) executeBangOperator() error {
 	case True:
 		return vm.push(False)
 	case False:
+		return vm.push(True)
+	case Null:
 		return vm.push(True)
 	default:
 		return vm.push(False)
