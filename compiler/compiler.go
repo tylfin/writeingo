@@ -99,6 +99,14 @@ func (c *Compiler) Compile(node ast.Node) error {
 		default:
 			return fmt.Errorf("unknown operator %s", node.Operator)
 		}
+	case *ast.ArrayLiteral:
+		for _, el := range node.Elements {
+			if err := c.Compile(el); err != nil {
+				return err
+			}
+		}
+
+		c.emit(code.OpArray, len(node.Elements))
 	case *ast.IfExpression:
 		// Add the condition to the stack
 		if err := c.Compile(node.Condition); err != nil {
