@@ -120,6 +120,25 @@ func (vm *VM) Run() error {
 			if err := vm.push(array); err != nil {
 				return err
 			}
+		case code.OpHash:
+			numElements := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+
+			hash, err := vm.buildHash(numElements)
+			if err != nil {
+				return err
+			}
+
+			if err := vm.push(hash); err != nil {
+				return err
+			}
+		case code.OpIndex:
+			index := vm.pop()
+			left := vm.pop()
+
+			if err := vm.executeIndexExpression(left, index); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -137,7 +156,65 @@ func isTruthy(obj object.Object) bool {
 	}
 }
 
+func (vm *VM) executeIndexExpression(left, index object.Object) error {
+	switch {
+	case left.Type() == object.ARRAY_OBJ && index.Type() == object.INTEGER_OBJ:
+		return vm.executeArrayIndex(left, index)
+	case left.Type() == object.HASH_OBJ:
+		return vm.executeHashIndex(left, index)
+	default:
+		return fmt.Errorf("index operator not supported: %s", left.Type())
+	}
+}
+
+func (vm *VM) executeArrayIndex(left, index object.Object) error {
+	array := left.(*object.Array)
+	idx := index.(*object.Integer).Value
+
+	max := int64(len(array.Elements) - 1)
+	if idx < 0 || idx > max {
+		return vm.push(Null)
+	}
+
+	return vm.push(array.Elements[idx])
+}
+
+func (vm *VM) executeHashIndex(left, index object.Object) error {
+	hash := left.(*object.Hash)
+	key, ok := index.(object.Hashable)
+	if !ok {
+		return fmt.Errorf("unusable as hash key: %s", index.Type())
+	}
+	pair, ok := hash.Pairs[key.HashKey()]
+	if !ok {
+		return vm.push(Null)
+	}
+
+	return vm.push(pair.Value)
+}
+
+func (vm *VM) buildHash(numElements int) (object.Object, error) {
+	// Again, this is a different implementation then what the book recommends. IMO it's much simpler to reason, and
+	// lowers the probability of messing up the stackpointer value.
+	pairs := make(map[object.HashKey]object.HashPair)
+	for i := 0; i < numElements/2; i++ {
+		value := vm.pop()
+		key := vm.pop()
+		hashKey, ok := key.(object.Hashable)
+		if !ok {
+			return nil, fmt.Errorf("unusable as hash key: %s", key.Type())
+		}
+
+		pair := object.HashPair{Key: key, Value: value}
+		pairs[hashKey.HashKey()] = pair
+	}
+
+	return &object.Hash{Pairs: pairs}, nil
+}
+
 func (vm *VM) buildArray(startIndex, endIndex int) object.Object {
+	// Note: I built this in the opposite direction to what the book recommends.
+	// It didn't make sense to access the stack directly versus using the pop method.
 	arr := make([]object.Object, endIndex-startIndex)
 	for i := startIndex; i < endIndex; i++ {
 		arr[endIndex-i-1] = vm.pop()

@@ -2,6 +2,7 @@ package compiler
 
 import (
 	"fmt"
+	"sort"
 
 	"monkey/ast"
 	"monkey/code"
@@ -107,6 +108,36 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 		c.emit(code.OpArray, len(node.Elements))
+	case *ast.HashLiteral:
+		keys := []ast.Expression{}
+		for key := range node.Pairs {
+			keys = append(keys, key)
+		}
+
+		// Ensure a deterministic map ordering (unlike Go)
+		sort.Slice(keys, func(i, j int) bool {
+			return keys[i].String() < keys[j].String()
+		})
+
+		for _, key := range keys {
+			if err := c.Compile(key); err != nil {
+				return err
+			}
+			if err := c.Compile(node.Pairs[key]); err != nil {
+				return err
+			}
+		}
+		c.emit(code.OpHash, len(node.Pairs)*2)
+	case *ast.IndexExpression:
+		if err := c.Compile(node.Left); err != nil {
+			return err
+		}
+
+		if err := c.Compile(node.Index); err != nil {
+			return err
+		}
+
+		c.emit(code.OpIndex)
 	case *ast.IfExpression:
 		// Add the condition to the stack
 		if err := c.Compile(node.Condition); err != nil {
