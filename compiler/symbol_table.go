@@ -3,9 +3,11 @@ package compiler
 type SymbolScope string
 
 const (
-	GlobalScope  SymbolScope = "GLOBAL"
-	LocalScope   SymbolScope = "LOCAL"
-	BuiltinScope SymbolScope = "BUILTIN"
+	GlobalScope   SymbolScope = "GLOBAL"
+	LocalScope    SymbolScope = "LOCAL"
+	BuiltinScope  SymbolScope = "BUILTIN"
+	FreeScope     SymbolScope = "FREE"
+	FunctionScope SymbolScope = "FunctionScope"
 )
 
 type Symbol struct {
@@ -19,11 +21,12 @@ type SymbolTable struct {
 	numDefinitions int
 	scope          SymbolScope
 	parent         *SymbolTable
+	FreeSymbols    []Symbol
 }
 
 func NewSymbolTable() *SymbolTable {
 	s := make(map[string]Symbol)
-	return &SymbolTable{store: s, scope: GlobalScope}
+	return &SymbolTable{store: s, scope: GlobalScope, FreeSymbols: []Symbol{}}
 }
 
 func (st *SymbolTable) Define(ident string) Symbol {
@@ -32,15 +35,38 @@ func (st *SymbolTable) Define(ident string) Symbol {
 	return st.store[ident]
 }
 
-func (st *SymbolTable) Resolve(ident string) (Symbol, bool) {
-	if v, ok := st.store[ident]; ok || st.parent == nil {
+func (st *SymbolTable) DefineFunctionName(ident string) Symbol {
+	st.store[ident] = Symbol{Name: ident, Scope: FunctionScope, Index: 0}
+	return st.store[ident]
+}
+
+func (st *SymbolTable) defineFree(original Symbol) Symbol {
+	st.FreeSymbols = append(st.FreeSymbols, original)
+
+	symbol := Symbol{Name: original.Name, Index: len(st.FreeSymbols) - 1}
+	symbol.Scope = FreeScope
+	st.store[original.Name] = symbol
+
+	return symbol
+}
+
+func (st *SymbolTable) Resolve(name string) (Symbol, bool) {
+	obj, ok := st.store[name]
+	if !ok && st.parent != nil {
+		obj, ok = st.parent.Resolve(name)
 		if !ok {
-			return v, ok
+			return obj, ok
 		}
-		return v, ok
+
+		if obj.Scope == GlobalScope || obj.Scope == BuiltinScope {
+			return obj, ok
+		}
+
+		free := st.defineFree(obj)
+		return free, true
 	}
 
-	return st.parent.Resolve(ident)
+	return obj, ok
 }
 
 func (st *SymbolTable) DefineBuiltin(index int, name string) Symbol {
