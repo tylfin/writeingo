@@ -113,6 +113,18 @@ let addTwo = fn(x) { return x + 2; };
 twice(addTwo, 2); // => 6
 ```
 
+## Benchmark
+
+From the final chapter of Writing a Compiler in Go:
+
+```bash
+$ go build -o fibonacci ./benchmark
+$ ./fibonacci -engine=eval
+engine=eval, result=9227465, duration=12.267151708s
+$ ./fibonacci -engine=vm
+engine=vm, result=9227465, duration=4.013193583s
+```
+
 ## PDF References
 
 - [Writing An Interpreter in Go](./docs/pdfs/writing_an_interpreter_in_go.pdf)
