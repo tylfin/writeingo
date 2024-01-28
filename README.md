@@ -115,7 +115,7 @@ twice(addTwo, 2); // => 6
 
 ## Benchmark
 
-From the final chapter of Writing a Compiler in Go:
+From the final chapter of Writing a Compiler in Go, my compiled version was 3.05x as fast:
 
 ```bash
 $ go build -o fibonacci ./benchmark
@@ -125,7 +125,7 @@ $ ./fibonacci -engine=vm
 engine=vm, result=9227465, duration=4.013193583s
 ```
 
-## PDF References
+## Book References
 
-- [Writing An Interpreter in Go](./docs/pdfs/writing_an_interpreter_in_go.pdf)
-- [Writing a Compiler in Go](./docs/pdfs/writing_a_compiler_in_go.pdf)
+- [Writing An Interpreter in Go](https://interpreterbook.com/)
+- [Writing a Compiler in Go](https://compilerbook.com/)
